@@ -37,7 +37,7 @@ if (YII_ENV == 'dev') {
     $commonParams['imgHost'] = 'https://img.myshared.top/';
     $commonParams['imageFirstPath'] = '/usr/local/var/www/wechatserver2/web';
 } else {
-    $commonParams['serverHost'] = 'https://api.fyy6.com/';
+    $commonParams['serverHost'] = 'https://cloud.myshared.top/';
     $commonParams['imgHost'] = 'https://img.fyy6.com/';
     $commonParams['imageFirstPath'] = '/home/www/wechatserver/web';
 
