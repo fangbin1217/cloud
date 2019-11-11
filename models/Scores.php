@@ -337,17 +337,17 @@ class Scores  extends \yii\db\ActiveRecord
             return json_decode($lastCache, true);
         }
 
+        $result = [
+            'totalScore' => 0, 'totalScoreColor'=> Yii::$app->params['red'],
+            'cjScore' => 0, 'cjScoreColor'=> Yii::$app->params['red'],
+            'maxScore'=>0, 'maxScoreColor' => Yii::$app->params['red'],
+            'minScore'=>0, 'minScoreColor' => Yii::$app->params['red'],
+            'jsScore'=>0, 'jsScoreColor' => Yii::$app->params['black'],
+            'timesScore'=>0, 'timesScoreColor' => Yii::$app->params['black']
+        ];
+
         $RoomUsers = RoomUsers::find()->where(['user_id'=>$user_id, 'is_del'=>0])->asArray()->all();
         if ($RoomUsers) {
-
-            $result = [
-                'totalScore' => 0, 'totalScoreColor'=> Yii::$app->params['red'],
-                'cjScore' => 0, 'cjScoreColor'=> Yii::$app->params['red'],
-                'maxScore'=>0, 'maxScoreColor' => Yii::$app->params['red'],
-                'minScore'=>0, 'minScoreColor' => Yii::$app->params['red'],
-                'jsScore'=>0, 'jsScoreColor' => Yii::$app->params['black'],
-                'timesScore'=>0, 'timesScoreColor' => Yii::$app->params['black']
-            ];
 
             $totalTime = 0;
 
