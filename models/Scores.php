@@ -205,13 +205,6 @@ class Scores  extends \yii\db\ActiveRecord
                 }
             }
 
-            if ($max > 0) {
-                $max += 100;
-            }
-            if ($min < 0) {
-                $min -= 100;
-            }
-
             $title2 = [];
             ksort($title);
             foreach ($title as $v1) {
