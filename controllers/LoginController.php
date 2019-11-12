@@ -16,10 +16,19 @@ class LoginController extends Controller
     public function actionIndex()
     {
         $this->jsonResponse['msg'] = 'login error';
-        $appid = Yii::$app->params['appid'];
-        $appsercet = Yii::$app->params['appsercet'];
-
         $params = json_decode(file_get_contents('php://input'),true);
+        $params['cloud'] = $params['cloud'] ?? 0;
+        if ($params['cloud'] == 2) {
+            $appid = Yii::$app->params['appid2'];
+            $appsercet = Yii::$app->params['appsercet2'];
+        } else if ($params['cloud'] == 3) {
+            $appid = Yii::$app->params['appid3'];
+            $appsercet = Yii::$app->params['appsercet3'];
+        } else {
+            $appid = Yii::$app->params['appid'];
+            $appsercet = Yii::$app->params['appsercet'];
+        }
+
         $CODE = $params['CODE'] ?? '';
         $bind_uid = $params['bind_uid'] ?? '';
         if (!$CODE) {
@@ -96,7 +105,7 @@ class LoginController extends Controller
 
                     //如果是扫码进来 就绑定用户及房间
                     if ($bind_uid) {
-                        $isSave = Users::bindedRoom($users->id, $bind_uid, $nickname);
+                        $isSave = Users::bindedRoom($users->id, $bind_uid, $nickname, false, $params['cloud']);
                     }
                 }
 
@@ -171,7 +180,7 @@ class LoginController extends Controller
 
                     //如果是扫码进来 就绑定用户及房间
                     if ($bind_uid) {
-                        $isSave = Users::bindedRoom($usersInfo['id'], $bind_uid, $usersInfo['nickname']);
+                        $isSave = Users::bindedRoom($usersInfo['id'], $bind_uid, $usersInfo['nickname'], false, $params['cloud']);
                     }
                 }
             }

@@ -159,7 +159,7 @@ class RoomController extends Controller
                 $codes = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 curl_close($ch);
                 if ($codes == 200) {
-                    $saveImage = Users::saveImage($output, Yii::$app->params['imageFirstPath']);
+                    $saveImage = Users::saveImage($output, Yii::$app->params['imageFirstPath'], $uid, 'L');
                     if ($saveImage) {
                         $Users = Users::find()->where(['id'=>$uid])->one();
                         $Users->local_avatar = $saveImage;

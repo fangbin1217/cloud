@@ -228,12 +228,13 @@ class UserController extends Controller
         $this->jsonResponse['msg'] = 'get qrcode fail';
         $params = json_decode(file_get_contents('php://input'),true);
         $access_token = $params['access_token'] ?? '';
+        $cloud = $params['cloud'] ?? 0;
         if ($access_token) {
             $cache = Yii::$app->redis->get('T#' . $access_token);
             if ($cache) {
                 $cacheList = json_decode($cache, true);
 
-                $qrcode = Users::getMyQrcode($cacheList['id']);
+                $qrcode = Users::getMyQrcode($cacheList['id'], $cloud);
                 //$qrcode = $cacheList['qrcode'];
                 if ($qrcode) {
                     $this->jsonResponse['code'] = 0;
@@ -316,9 +317,6 @@ class UserController extends Controller
                         $this->jsonResponse['total'] = $queryStartingScore['total'];
                         $this->jsonResponse['userCount'] = count($queryStarting);
                     }
-
-                    //$openId = $cacheList['openid'] ?? '';
-                    //Users::collectFormId($formId, $openId);
                 }
             }
         } else {
@@ -374,6 +372,7 @@ class UserController extends Controller
         $params = json_decode(file_get_contents('php://input'),true);
         $access_token = $params['access_token'] ?? '';
         $nickname = $params['nickname'] ?? '';
+        $cloud = $params['cloud'] ?? 0;
         $nickname = trim($nickname);
         if ($access_token) {
             $cache = Yii::$app->redis->get('T#' . $access_token);
@@ -398,7 +397,7 @@ class UserController extends Controller
                 }
 
                 if ($getLock) {
-                    $isSave = Users::bindedRoom(0, $cacheList['id'], $nickname, true);
+                    $isSave = Users::bindedRoom(0, $cacheList['id'], $nickname, true, $cloud);
 
                     $this->jsonResponse['data']['isFull'] = Users::$isFull;
                     $this->jsonResponse['data']['playerName'] = Users::$playerName;

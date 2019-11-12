@@ -59,13 +59,26 @@ class Users  extends \yii\db\ActiveRecord
     }
 
 
-    static public function createXCX() {
-        $cache = Yii::$app->redis->get('XCX');
+    static public function createXCX($cloud = 0) {
+        $xcxKey = '';
+        if ($cloud == 2) {
+            $xcxKey = 'XCX2';
+            $appid = Yii::$app->params['appid2'];
+            $appsercet = Yii::$app->params['appsercet2'];
+        } else if ($cloud == 3) {
+            $xcxKey = 'XCX3';
+            $appid = Yii::$app->params['appid3'];
+            $appsercet = Yii::$app->params['appsercet3'];
+        } else {
+            $xcxKey = 'XCX';
+            $appid = Yii::$app->params['appid'];
+            $appsercet = Yii::$app->params['appsercet'];
+        }
+        $cache = Yii::$app->redis->get($xcxKey);
         if ($cache) {
             return $cache;
         }
-        $appid = Yii::$app->params['appid'];
-        $appsercet = Yii::$app->params['appsercet'];
+
         $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsercet";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -81,15 +94,15 @@ class Users  extends \yii\db\ActiveRecord
             $output = json_decode($output, true);
             $xcx = $output['access_token'] ?? '';
             if ($xcx) {
-                Yii::$app->redis->set('XCX', $xcx);
-                Yii::$app->redis->expire('XCX', Yii::$app->params['XCX_ACCESS_TOKEN']);
+                Yii::$app->redis->set($xcxKey, $xcx);
+                Yii::$app->redis->expire($xcxKey, Yii::$app->params['XCX_ACCESS_TOKEN']);
             }
             return $xcx;
         }
         return '';
     }
 
-    static public function getMyQrcode($uid = 0) {
+    static public function getMyQrcode($uid = 0, $cloud = 0) {
         if (!$uid) {
             return '';
         }
@@ -106,7 +119,7 @@ class Users  extends \yii\db\ActiveRecord
         }
 
 
-        $saveQrcode = Users::saveQrcode($uid);
+        $saveQrcode = Users::saveQrcode($uid, $cloud);
         if ($saveQrcode) {
             Yii::$app->redis->set('QR#'.$uid, $saveQrcode);
             Yii::$app->redis->expire('QR#'.$uid, Yii::$app->params['qrcodeImageTime']);
@@ -122,8 +135,8 @@ class Users  extends \yii\db\ActiveRecord
         return '';
     }
 
-    static public function saveQrcode($uid = 0) {
-        $xcx = Users::createXCX();
+    static public function saveQrcode($uid = 0, $cloud = 0) {
+        $xcx = Users::createXCX($cloud);
         if (!$xcx) {
             return '';
         }
@@ -148,13 +161,13 @@ class Users  extends \yii\db\ActiveRecord
         curl_close($ch);
         if ($output) {
             if (strpos($output, 'errcode') === false) {
-                return Users::saveImage($output);
+                return Users::saveImage($output, '', $uid, 'Q');
             }
         }
         return '';
     }
 
-    static public function saveImage($buffer, $firstPath = '') {
+    static public function saveImage($buffer, $firstPath = '', $uid = 0, $prev = 'N') {
         //生成图片
         if (!$firstPath) {
             $imgDir = $_SERVER['DOCUMENT_ROOT'];
@@ -166,7 +179,7 @@ class Users  extends \yii\db\ActiveRecord
             mkdir($imgDir2, 0777);
             chmod($imgDir2, 0777);
         }
-        $name = date('dHis').'-'.rand(1000,9999).'.png';
+        $name = $prev.date('dHis').'-'.$uid.rand(1000,9999).'.png';
         $filename = $imgDir2.'/'.$name;///要生成的图片名字
 
         $file = fopen($filename,"w");//打开文件准备写入
@@ -181,7 +194,7 @@ class Users  extends \yii\db\ActiveRecord
     }
 
 
-    static public function bindedRoom($cur_user_id, $binded_user_id = 0, $nickname = '', $isSd = false) {
+    static public function bindedRoom($cur_user_id, $binded_user_id = 0, $nickname = '', $isSd = false, $cloud = 0) {
         if ($isSd) {
             //查找最新房间数据
             $roomSd = Rooms::find()->where(['user_id'=>$binded_user_id, 'is_del'=>0])->andWhere(['in', 'status', [Rooms::STATUS_IS_READY, Rooms::STATUS_BEGINING]])->asArray()->one();
@@ -209,7 +222,7 @@ class Users  extends \yii\db\ActiveRecord
             }
 
             //check is  or not ok
-            $accessToken = Users::createXCX();
+            $accessToken = Users::createXCX($cloud);
 
             $data_list = ['content'=> $nickname];
             $data_string = json_encode($data_list, JSON_UNESCAPED_UNICODE);
