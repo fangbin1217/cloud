@@ -33,7 +33,7 @@ $commonParams = [
     'image_no1' => 'https://img.myshared.top/icon/NO.png',
     'image_no2' => 'https://img.myshared.top/icon/NO2.png',
     'shareImage' => 'https://img.myshared.top/share.png',
-    'notice' => '尊敬的用户，你好，欢迎来到本小程序，您的满意是我们最好的服务！'
+    'notice' => '尊敬的用户，欢迎来到本小程序，您的满意是我们最大的收获！'
 ];
 
 if (YII_ENV == 'dev') {
