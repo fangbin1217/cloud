@@ -89,7 +89,6 @@ class Users  extends \yii\db\ActiveRecord
         $output = curl_exec($ch);
         $codes = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-
         if ($codes == 200) {
             $output = json_decode($output, true);
             $xcx = $output['access_token'] ?? '';
@@ -257,6 +256,10 @@ class Users  extends \yii\db\ActiveRecord
             Users::$playerAvatar = Users::getAvatar($cur_user_id);
         }
 
+        if ($cur_user_id == $binded_user_id) {
+            Users::$error_msg = '不能绑定自己';
+            return false;
+        }
 
 
         if (!$binded_user_id) {
