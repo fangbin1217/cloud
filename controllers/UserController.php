@@ -120,13 +120,12 @@ class UserController extends Controller
     {
         $this->jsonResponse['msg'] = 'get userinfo fail';
         $params = json_decode(file_get_contents('php://input'),true);
+        $cloud = $params['cloud'] ?? 0;
         $access_token = $params['access_token'] ?? '';
         $bind_uid = $params['bind_uid'] ?? '';
         if ($access_token) {
             $cache = Yii::$app->redis->get('T#' . $access_token);
             if ($cache) {
-
-
                 $cacheList = json_decode($cache, true);
                 $this->jsonResponse['code'] = 0;
                 $this->jsonResponse['msg'] = 'get userinfo success';
@@ -185,7 +184,7 @@ class UserController extends Controller
 
                 //如果是扫码进来 就绑定用户及房间
                 if ($bind_uid) {
-                    $isSave = Users::bindedRoom($cacheList['id'], $bind_uid, $cacheList['nickname']);
+                    $isSave = Users::bindedRoom($cacheList['id'], $bind_uid, $cacheList['nickname'], false, $cloud);
                 }
             }
         }
