@@ -451,11 +451,6 @@ class Users  extends \yii\db\ActiveRecord
                     Yii::$app->redis->del('LAST#' . $val['user_id']);
                 }
 
-                $lastCache2 = Yii::$app->redis->get('LASTYEAR#' . $val['user_id']);
-                if ($lastCache2) {
-                    Yii::$app->redis->del('LASTYEAR#' . $val['user_id']);
-                }
-
                 $lastCache2 = Yii::$app->redis->get('LASTYEAR2#' . $val['user_id']);
                 if ($lastCache2) {
                     Yii::$app->redis->del('LASTYEAR2#' . $val['user_id']);

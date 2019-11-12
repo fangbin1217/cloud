@@ -91,31 +91,6 @@ class ScoreController extends Controller
         return json_encode($this->jsonResponse, JSON_UNESCAPED_UNICODE);
     }
 
-    public function actionLastyear()
-    {
-        $this->jsonResponse['msg'] = 'get results fail';
-        $params = json_decode(file_get_contents('php://input'),true);
-        $access_token = $params['access_token'] ?? '';
-        if ($access_token) {
-            $cache = Yii::$app->redis->get('T#' . $access_token);
-            if ($cache) {
-                $cacheList = json_decode($cache, true);
-
-                $vip = 0;
-                if (isset($cacheList['vip'])) {
-                    $vip = $cacheList['vip'];
-                }
-                $myResults = (new Scores())->getLastYearScore($cacheList['id'], $vip);
-                if ($myResults) {
-                    $this->jsonResponse['code'] = 0;
-                    $this->jsonResponse['msg'] = 'get results success';
-                    $this->jsonResponse['data'] = $myResults;
-                }
-
-            }
-        }
-        return json_encode($this->jsonResponse, JSON_UNESCAPED_UNICODE);
-    }
 
     public function actionLastyear2()
     {
